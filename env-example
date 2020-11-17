@@ -1,2 +1,3 @@
 SW2_LOGIN=your.login@gmail.com
 SW2_PASSWORD=yourpassword
+DATABASE_URL=postgres://alton_gaz:secret@localhost/alton

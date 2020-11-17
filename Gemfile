@@ -2,6 +2,8 @@
 source 'https://rubygems.org'
 
 gem 'capybara'
-gem 'selenium-webdriver'
-gem 'pry'
 gem 'dotenv'
+gem 'pg'
+gem 'pry'
+gem 'selenium-webdriver'
+gem 'sequel'
