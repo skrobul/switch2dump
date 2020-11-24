@@ -14,12 +14,28 @@ DB.loggers << Logger.new($stdout)
 class Gas < Sequel::Model; end
 Gas.unrestrict_primary_key
 
-Capybara.register_driver :chrome do |app|
+Capybara.register_driver :headless_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
+  [
+    'headless',
+    'window-size=1280x1280',
+    'disable-gpu',
+    'no-sandbox',
+    'disable-dev-shm-usage'
+  ].each { |arg| options.add_argument(arg) }
+
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
+Capybara.default_max_wait_time = 5
 
-Capybara.default_driver = Capybara.javascript_driver = :chrome
+# uncomment for debug
+if ENV['NO_HEADLESS']
+  Capybara.default_driver = Capybara.javascript_driver = :selenium_chrome
+else
+  Capybara.default_driver = Capybara.javascript_driver = :headless_chrome
+end
+
+
 
 module Switch2
   BillEntry = Struct.new(:date, :type, :amount) do
@@ -59,8 +75,10 @@ module Switch2
 
    def download_statement
      visit 'https://my.switch2.co.uk/MeterReadings/History'
-#     find('#PageSize').select('All')
-#     find('#ReloadButton').click
+     if ENV['ALL']
+       find('#PageSize').select('All')
+       find('#ReloadButton').click
+     end
      find_all('.meter-reading-history-table-data-row').map do |el|
        logger.debug 'Iterating over element'
        date, rtype = el
